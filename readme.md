@@ -12,6 +12,29 @@ In the meantime space pirates have taken over, building large encampments and ho
 
 ## Controls
 
+| Action | XBox | Mouse and Keyboard |
+|---|---|---|
+|Move|Left Stick|WASD|
+|Aim|Right Stick|Mouse|
+|Melee|Right Bumper|Mouse 1|
+|Fire|Right Trigger|Mouse 2|
+|Use|A|E|
+|Bullet Time|Left Trigger|Shift|
+|Use Power|Y|Q|
+|Reload|X|R|
+|Dash|Left Bumper|Space|
+|Sidearm|D-Right|1|
+|Longarm|D-Up|2|
+|Heavy|D-Left|3|
+|Grapple|D-Down|4|
+|Heal|B|F|
+|Map|Select|Tab|
+|Pause|Start|Esc|
+
+## UI
+
+Health and mana bars on the upper left. Mini map on the upper right. Ammo display on the lower right.
+
 ## Art
 
 ## Level/World Design
