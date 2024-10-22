@@ -1,5 +1,11 @@
+import { Graphics } from "cleo";
+import { Camera } from "../libs/core/camera";
 import { HashGrid2D } from "../libs/core/data";
 import { Ldtk } from "../libs/ldtk/ldtk";
+import { HEIGHT, WIDTH } from "./globals";
+import { AABB } from "../libs/core/aabb";
+import { Vec2 } from "../libs/core/la";
+import { Player } from "./player";
 
 export class World{
     rooms: Set<Room>;
@@ -7,12 +13,34 @@ export class World{
     cellWidthPx: number;
     sectorWidthCells: number;
     sectorHeightCells: number;
+    camera: Camera;
+    brown: Graphics.Texture;
+    player: Player;
     constructor(rooms: Set<Room>, sectorLookup: HashGrid2D<Sector | undefined>, cellWidthPx: number, sectorWidthCells: number, sectorHeightCells: number){
         this.rooms = rooms;
         this.sectorLookup = sectorLookup;
         this.cellWidthPx = cellWidthPx;
         this.sectorWidthCells = sectorWidthCells;
         this.sectorHeightCells = sectorHeightCells;
+        this.camera = new Camera(WIDTH, HEIGHT);
+        this.brown = Graphics.Texture.fromColor(WIDTH, HEIGHT, 139, 69, 19, 255);
+        this.player = new Player(this);
+    }
+    update(dt: number){
+        this.player.update(dt);
+    }
+    draw(){
+        this.camera.draw(0, 0, ()=>{
+            this.brown.draw(-WIDTH/2, -HEIGHT/2);
+            this.player.draw();
+        });
+    }
+    /**
+    Mutates velocity and position in place.
+    */
+    moveAndSlide(dt: number, velocity: Vec2, aabb: AABB){
+        // TODO: implement collision detection
+        aabb.position.addMutate(velocity.mul(dt));
     }
     static fromLdtk(data: Ldtk){
         const cellWidthPx = data.defaultGridSize;
