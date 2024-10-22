@@ -1,4 +1,4 @@
-import { Graphics } from "cleo";
+import { Graphics, System } from "cleo";
 import { Camera } from "../libs/core/camera";
 import { HashGrid2D } from "../libs/core/data";
 import { Ldtk } from "../libs/ldtk/ldtk";
@@ -25,13 +25,26 @@ export class World{
         this.camera = new Camera(WIDTH, HEIGHT);
         this.brown = Graphics.Texture.fromColor(WIDTH, HEIGHT, 139, 69, 19, 255);
         this.player = new Player(this);
+        for (const sector of sectorLookup.data.values()) {
+            if(sector) {
+                this.drawSector(sector);
+                System.println(sector.posX, sector.posY);
+            }
+        }
     }
     update(dt: number){
         this.player.update(dt);
     }
     draw(){
         this.camera.draw(0, 0, ()=>{
-            this.brown.draw(-WIDTH/2, -HEIGHT/2);
+            const sw = this.sectorWidthCells*this.cellWidthPx;
+            const sh = this.sectorHeightCells*this.cellWidthPx;
+            for (const val of this.sectorLookup.data.values()) {
+                if(!val) continue;
+                if(!val.texture) continue;
+                val.texture.draw(val.posX*sw, val.posY*sh);
+            }
+            // this.brown.draw(-WIDTH/2, -HEIGHT/2);
             this.player.draw();
         });
     }
@@ -42,10 +55,21 @@ export class World{
         // TODO: implement collision detection
         aabb.position.addMutate(velocity.mul(dt));
     }
+    private drawSector(sector: Sector){
+        const sw = this.sectorWidthCells*this.cellWidthPx;
+        const sh = this.sectorHeightCells*this.cellWidthPx;
+        if(!sector.texture){
+            sector.texture = Graphics.Texture.new(sw, sh);
+        }
+        Graphics.pushRenderTarget(sector.texture);
+        Graphics.clear();
+        this.brown.draw(0, 0);
+        Graphics.popRenderTarget();
+    }
     static fromLdtk(data: Ldtk){
         const cellWidthPx = data.defaultGridSize;
-        const sectorWidthPx = (data.defaultLevelWidth ?? 0) / cellWidthPx;
-        const sectorHeightPx = (data.defaultLevelHeight ?? 0) / cellWidthPx;
+        const sectorWidthPx = (data.defaultLevelWidth ?? 0);
+        const sectorHeightPx = (data.defaultLevelHeight ?? 0);
         const sectorWidthCells = sectorWidthPx / cellWidthPx;
         const sectorHeightCells = sectorHeightPx / cellWidthPx;
         const rooms = new Set<Room>();
@@ -57,12 +81,13 @@ export class World{
             const roomHeightCells = roomHeightSectors * sectorHeightCells;
             const roomXSectors = level.worldX / sectorWidthPx;
             const roomYSectors = level.worldY / sectorHeightPx;
+            // System.println(roomXSectors, roomYSectors);
             const layers = level.layerInstances;
             if(!layers) throw 'validation error';
             const intGrid = layers[0].intGridCsv;
             for(let idx = 0; idx < intGrid.length; idx++){
                 const cx = idx % roomWidthCells;
-                const cy = Math.floor(idx / roomHeightCells);
+                const cy = Math.floor(idx / roomWidthCells);
                 const sx = Math.floor(cx / sectorWidthCells) + roomXSectors;
                 const sy = Math.floor(cy / sectorHeightCells) + roomYSectors;
                 let sector = sectorLookup.get(sx, sy);
@@ -90,4 +115,5 @@ interface Sector{
     posX: number;
     posY: number;
     cells: number[];
+    texture?: Graphics.Texture;
 }
