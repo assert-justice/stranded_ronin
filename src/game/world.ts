@@ -10,11 +10,13 @@ import { Player } from "./player";
 export class World{
     rooms: Set<Room>;
     sectorLookup: HashGrid2D<Sector | undefined>;
+    collisionLookup: HashGrid2D<number>;
     cellWidthPx: number;
     sectorWidthCells: number;
     sectorHeightCells: number;
     camera: Camera;
     brown: Graphics.Texture;
+    wall: Graphics.Texture;
     player: Player;
     constructor(rooms: Set<Room>, sectorLookup: HashGrid2D<Sector | undefined>, cellWidthPx: number, sectorWidthCells: number, sectorHeightCells: number){
         this.rooms = rooms;
@@ -24,12 +26,14 @@ export class World{
         this.sectorHeightCells = sectorHeightCells;
         this.camera = new Camera(WIDTH, HEIGHT);
         this.brown = Graphics.Texture.fromColor(WIDTH, HEIGHT, 139, 69, 19, 255);
+        this.wall = Graphics.Texture.fromColor(14, 14, 100, 100, 100, 255);
         this.player = new Player(this);
+        this.player.position.x = WIDTH/2; this.player.position.y = HEIGHT/2;
+        this.collisionLookup = new HashGrid2D(0);
         for (const sector of sectorLookup.data.values()) {
-            if(sector) {
-                this.drawSector(sector);
-                System.println(sector.posX, sector.posY);
-            }
+            if(!sector) continue;
+            this.drawSector(sector);
+            this.addSectorCollision(sector);
         }
     }
     update(dt: number){
@@ -55,6 +59,17 @@ export class World{
         // TODO: implement collision detection
         aabb.position.addMutate(velocity.mul(dt));
     }
+    addSectorCollision(sector: Sector){
+        const xOffset = sector.posX * this.sectorWidthCells;
+        const yOffset = sector.posY * this.sectorHeightCells;
+        for(let idx = 0; idx < sector.cells.length; idx++){
+            const id = sector.cells[idx];
+            if(id === 0) continue;
+            const cx = idx % this.sectorWidthCells + xOffset;
+            const cy = Math.floor(idx / this.sectorWidthCells) + yOffset;
+            this.collisionLookup.set(cx, cy, 1);
+        }
+    }
     private drawSector(sector: Sector){
         const sw = this.sectorWidthCells*this.cellWidthPx;
         const sh = this.sectorHeightCells*this.cellWidthPx;
@@ -64,6 +79,13 @@ export class World{
         Graphics.pushRenderTarget(sector.texture);
         Graphics.clear();
         this.brown.draw(0, 0);
+        for(let idx = 0; idx < sector.cells.length; idx++){
+            const id = sector.cells[idx];
+            if(id === 0) continue;
+            const cx = idx % this.sectorWidthCells;
+            const cy = Math.floor(idx / this.sectorWidthCells);
+            this.wall.draw(cx * this.cellWidthPx + 1, cy * this.cellWidthPx + 1);
+        }
         Graphics.popRenderTarget();
     }
     static fromLdtk(data: Ldtk){

@@ -16,6 +16,7 @@ export class Player extends Actor{
     update(dt: number): void {
         this.velocity = this.move.getValue().mulMutate(this.speed);
         super.update(dt);
+        this.world.camera.position = this.position.copy();
     }
     draw(): void {
         this.tex.draw(this.position.x, this.position.y);
