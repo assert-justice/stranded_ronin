@@ -57,7 +57,33 @@ export class World{
     */
     moveAndSlide(dt: number, velocity: Vec2, aabb: AABB){
         // TODO: implement collision detection
+        const cx = Math.floor(aabb.position.x / this.cellWidthPx);
+        const cy = Math.floor(aabb.position.y / this.cellWidthPx);
         aabb.position.addMutate(velocity.mul(dt));
+        let minX = -Infinity;
+        let minY = -Infinity;
+        let maxX = Infinity;
+        let maxY = Infinity;
+        if(this.collisionLookup.get(cx - 1, cy)) minX = cx * this.cellWidthPx;
+        if(this.collisionLookup.get(cx + 1, cy)) maxX = cx * this.cellWidthPx;
+        if(aabb.position.x < minX){
+            velocity.x = 0;
+            aabb.position.x = minX;
+        }
+        else if(aabb.position.x > maxX){
+            velocity.x = 0;
+            aabb.position.x = maxX;
+        }
+        if(this.collisionLookup.get(cx, cy - 1)) minY = cy * this.cellWidthPx;
+        if(this.collisionLookup.get(cx, cy + 1)) maxY = cy * this.cellWidthPx;
+        if(aabb.position.y < minY){
+            velocity.y = 0;
+            aabb.position.y = minY;
+        }
+        else if(aabb.position.y > maxY){
+            velocity.y = 0;
+            aabb.position.y = maxY;
+        }
     }
     addSectorCollision(sector: Sector){
         const xOffset = sector.posX * this.sectorWidthCells;
@@ -100,7 +126,7 @@ export class World{
             const roomWidthSectors = level.pxWid / sectorWidthPx;
             const roomHeightSectors = level.pxHei / sectorHeightPx;
             const roomWidthCells = roomWidthSectors * sectorWidthCells;
-            const roomHeightCells = roomHeightSectors * sectorHeightCells;
+            // const roomHeightCells = roomHeightSectors * sectorHeightCells;
             const roomXSectors = level.worldX / sectorWidthPx;
             const roomYSectors = level.worldY / sectorHeightPx;
             // System.println(roomXSectors, roomYSectors);
