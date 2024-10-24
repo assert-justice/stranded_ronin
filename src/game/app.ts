@@ -13,6 +13,7 @@ export class App{
     constructor(){
         this.bg = Graphics.Texture.new(WIDTH, HEIGHT);
         this.wd = new WindowDisplay(this.bg);
+        // this.wd.pixelPerfect = true;
     }
     setState(state: AppState){
         this.state = state;
@@ -31,5 +32,8 @@ export class App{
         // draw ui
         Graphics.popRenderTarget();
         this.wd.draw();
+    }
+    getMousePosition(){
+        return this.wd.getMousePosition();
     }
 }

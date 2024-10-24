@@ -2,7 +2,8 @@ import { Graphics, System } from "cleo";
 import { Actor } from "./actor";
 import { World } from "./world";
 import { VAxis2D } from "../libs/core/input_manager";
-import { Globals } from "./globals";
+import { Globals, HEIGHT, WIDTH } from "./globals";
+import { Vec2 } from "../libs/core/la";
 
 export class Player extends Actor{
     tex: Graphics.Texture;
@@ -24,7 +25,9 @@ export class Player extends Actor{
     }
     draw(): void {
         this.tex.draw(this.position.x, this.position.y);
-        const aim = this.aim.getValue().mul(10);
-        this.reticule.draw(this.position.x + aim.x, this.position.y + aim.y);
+        // const aim = this.aim.getValue().mul(10);
+        // this.reticule.draw(this.position.x + aim.x, this.position.y + aim.y);
+        const pos = Globals.app.getMousePosition().addMutate(this.world.camera.position).subMutate(new Vec2(WIDTH/2, HEIGHT/2));
+        this.reticule.draw(pos.x, pos.y);
     }
 }

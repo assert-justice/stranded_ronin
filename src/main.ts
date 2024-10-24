@@ -1,7 +1,7 @@
 import { Engine, Window } from "cleo";
 import { Globals } from "./game/globals";
 
-Window.setStats("Stranded Ronin", 1920, 1080);
+Window.setStats("Stranded Ronin", 800, 600);
 
 Engine.init = () => {
     Globals.init();

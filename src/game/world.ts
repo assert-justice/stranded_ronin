@@ -48,7 +48,6 @@ export class World{
                 if(!val.texture) continue;
                 val.texture.draw(val.posX*sw, val.posY*sh);
             }
-            // this.brown.draw(-WIDTH/2, -HEIGHT/2);
             this.player.draw();
         });
     }
@@ -56,7 +55,6 @@ export class World{
     Mutates velocity and position in place.
     */
     moveAndSlide(dt: number, velocity: Vec2, aabb: AABB){
-        // TODO: implement collision detection
         const cx = Math.floor(aabb.position.x / this.cellWidthPx);
         const cy = Math.floor(aabb.position.y / this.cellWidthPx);
         aabb.position.addMutate(velocity.mul(dt));
@@ -126,10 +124,8 @@ export class World{
             const roomWidthSectors = level.pxWid / sectorWidthPx;
             const roomHeightSectors = level.pxHei / sectorHeightPx;
             const roomWidthCells = roomWidthSectors * sectorWidthCells;
-            // const roomHeightCells = roomHeightSectors * sectorHeightCells;
             const roomXSectors = level.worldX / sectorWidthPx;
             const roomYSectors = level.worldY / sectorHeightPx;
-            // System.println(roomXSectors, roomYSectors);
             const layers = level.layerInstances;
             if(!layers) throw 'validation error';
             const intGrid = layers[0].intGridCsv;
