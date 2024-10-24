@@ -6,12 +6,16 @@ import { Globals } from "./globals";
 
 export class Player extends Actor{
     tex: Graphics.Texture;
+    reticule: Graphics.Texture;
     move: VAxis2D;
+    aim: VAxis2D;
     speed = 300;
     constructor(world: World){
         super(world);
         this.tex = Graphics.Texture.fromColor(16, 16, 0, 255, 0, 255);
+        this.reticule = Graphics.Texture.fromColor(4, 4, 255, 0, 0, 255);
         this.move = Globals.inputManager.getAxis2D("move");
+        this.aim = Globals.inputManager.getAxis2D("aim");
     }
     update(dt: number): void {
         this.velocity = this.move.getValue().mulMutate(this.speed);
@@ -20,5 +24,7 @@ export class Player extends Actor{
     }
     draw(): void {
         this.tex.draw(this.position.x, this.position.y);
+        const aim = this.aim.getValue().mul(10);
+        this.reticule.draw(this.position.x + aim.x, this.position.y + aim.y);
     }
 }
