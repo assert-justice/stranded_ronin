@@ -1,5 +1,4 @@
 import { Graphics, System } from "cleo";
-import { Camera } from "../libs/core/camera";
 import { HashGrid2D } from "../libs/core/data";
 import { Ldtk } from "../libs/ldtk/ldtk";
 import { HEIGHT, WIDTH } from "./globals";
@@ -7,6 +6,7 @@ import { AABB } from "../libs/core/aabb";
 import { Vec2 } from "../libs/core/la";
 import { Player } from "./player";
 import { clamp } from "../libs/core/math";
+import { Camera } from "../libs/core/camera";
 
 export class World{
     rooms: Set<Room>;
@@ -16,7 +16,7 @@ export class World{
     sectorWidthCells: number;
     sectorHeightCells: number;
     camera: Camera;
-    cameraSpeed = 300;
+    // cameraSpeed = 500;
     brown: Graphics.Texture;
     wall: Graphics.Texture;
     player: Player;
@@ -40,9 +40,10 @@ export class World{
             this.addSectorCollision(sector);
         }
     }
-    private shouldUpdate(dt: number): boolean{
+    /*private shouldUpdate(dt: number): boolean{
         // Check if camera is inbounds
         // If it's not move it towards a valid position
+        // Needs to follow player
 
         // Check if current sector is defined. If not do nothing.
         if(!this.currentSector) return true;
@@ -65,7 +66,19 @@ export class World{
         this.camera.position.addMutate(vec.normalizeMutate().mulMutate(speed));
         // System.println(vec.x, vec.y);
         return false;
-    }
+    }*/
+    // private handleCamera(dt: number){
+    //     // Check if current sector is defined. If not do nothing.
+    //     if(!this.currentSector) return true;
+    //     const sw = this.sectorWidthCells*this.cellWidthPx;
+    //     const sh = this.sectorHeightCells*this.cellWidthPx;
+    //     const room = this.currentSector.room;
+    //     this.camera.minX = room.posX * sw + WIDTH/2;
+    //     this.camera.minY = room.posY * sh + HEIGHT/2;
+    //     this.camera.maxX = (room.posX + room.width) * sw - WIDTH/2;
+    //     this.camera.maxY = (room.posY + room.height) * sh - HEIGHT/2;
+    //     this.camera.update(dt);
+    // }
     update(dt: number){
         // if the camera is out of bounds, move it towards inbounds
         // otherwise update player etc
@@ -73,7 +86,23 @@ export class World{
         const sx = Math.floor(this.player.position.x / this.sectorWidthCells / this.cellWidthPx);
         const sy = Math.floor(this.player.position.y / this.sectorHeightCells / this.cellWidthPx);
         this.currentSector = this.sectorLookup.get(sx, sy);
-        if(!this.shouldUpdate(dt)) return;
+        if(this.currentSector){
+            const sw = this.sectorWidthCells*this.cellWidthPx;
+            const sh = this.sectorHeightCells*this.cellWidthPx;
+            const room = this.currentSector.room;
+            this.camera.minX = room.posX * sw + WIDTH/2;
+            this.camera.minY = room.posY * sh + HEIGHT/2;
+            this.camera.maxX = (room.posX + room.width) * sw - WIDTH/2;
+            this.camera.maxY = (room.posY + room.height) * sh - HEIGHT/2;
+        }
+        else{
+            this.camera.resetExtents();
+        }
+        this.camera.targetPosition = this.player.position.copy();
+        this.camera.update(dt);
+        // if(!this.shouldUpdate(dt)) return;
+        // this.handleCamera(dt);
+        if(this.camera.isOob(this.camera.position)) return;
         this.player.update(dt);
     }
     draw(){

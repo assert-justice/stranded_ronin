@@ -28,7 +28,7 @@ export class Camera{
     update(dt: number){
         if(this.isOob(this.targetPosition)) this.clamp(this.targetPosition);
         const dist = this.position.distance(this.targetPosition);
-        if(dist < 0.1) return;
+        // if(dist < 0.1) return;
         if(dist < this.smoothSpeed * dt){
             this.position = this.targetPosition;
             return;
