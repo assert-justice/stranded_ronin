@@ -1,6 +1,7 @@
 import { Window } from "cleo";
 import { App } from "./app";
 import { InputManager, JoyAxis, Key } from "../libs/core/input_manager";
+import { TextureManager } from "../libs/core/texture_manager";
 
 export const WIDTH = 640;
 export const HEIGHT = 352;
@@ -8,9 +9,11 @@ export const HEIGHT = 352;
 export class Globals{
     static app: App;
     static inputManager: InputManager;
+    static textureManager: TextureManager;
     static init(){
         //
-        this.app = new App();
+        this.textureManager = new TextureManager();
+        this.textureManager.add('player', './sprites/redsamurai.png');
         this.inputManager = new InputManager();
         // configure inputs
         const move = this.inputManager.addAxis2D("move");
@@ -19,6 +22,6 @@ export class Globals{
         const aim = this.inputManager.addAxis2D("aim");
         aim.xAxis.addJoyAxis(0, JoyAxis.rx);
         aim.yAxis.addJoyAxis(0, JoyAxis.ry);
-        // const aim = this.inputManager.addAxis2D("aim");
+        this.app = new App();
     }
 }

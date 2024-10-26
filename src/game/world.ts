@@ -5,7 +5,6 @@ import { HEIGHT, WIDTH } from "./globals";
 import { AABB } from "../libs/core/aabb";
 import { Vec2 } from "../libs/core/la";
 import { Player } from "./player";
-import { clamp } from "../libs/core/math";
 import { Camera } from "../libs/core/camera";
 
 export class World{
@@ -16,7 +15,6 @@ export class World{
     sectorWidthCells: number;
     sectorHeightCells: number;
     camera: Camera;
-    // cameraSpeed = 500;
     brown: Graphics.Texture;
     wall: Graphics.Texture;
     player: Player;
@@ -40,49 +38,7 @@ export class World{
             this.addSectorCollision(sector);
         }
     }
-    /*private shouldUpdate(dt: number): boolean{
-        // Check if camera is inbounds
-        // If it's not move it towards a valid position
-        // Needs to follow player
-
-        // Check if current sector is defined. If not do nothing.
-        if(!this.currentSector) return true;
-        const sw = this.sectorWidthCells*this.cellWidthPx;
-        const sh = this.sectorHeightCells*this.cellWidthPx;
-        const room = this.currentSector.room;
-        const camMinX = room.posX * sw + WIDTH/2;
-        const camMinY = room.posY * sh + HEIGHT/2;
-        const camMaxX = (room.posX + room.width) * sw - WIDTH/2;
-        const camMaxY = (room.posY + room.height) * sh - HEIGHT/2;
-        const camTargetX = clamp(this.camera.position.x, camMinX, camMaxX);
-        const camTargetY = clamp(this.camera.position.y, camMinY, camMaxY);
-        const vec = new Vec2(camTargetX - this.camera.position.x, camTargetY - this.camera.position.y);
-        const speed = this.cameraSpeed *dt;
-        if(vec.length() < speed){
-            this.camera.position.x = camTargetX;
-            this.camera.position.y = camTargetY;
-            return true;
-        }
-        this.camera.position.addMutate(vec.normalizeMutate().mulMutate(speed));
-        // System.println(vec.x, vec.y);
-        return false;
-    }*/
-    // private handleCamera(dt: number){
-    //     // Check if current sector is defined. If not do nothing.
-    //     if(!this.currentSector) return true;
-    //     const sw = this.sectorWidthCells*this.cellWidthPx;
-    //     const sh = this.sectorHeightCells*this.cellWidthPx;
-    //     const room = this.currentSector.room;
-    //     this.camera.minX = room.posX * sw + WIDTH/2;
-    //     this.camera.minY = room.posY * sh + HEIGHT/2;
-    //     this.camera.maxX = (room.posX + room.width) * sw - WIDTH/2;
-    //     this.camera.maxY = (room.posY + room.height) * sh - HEIGHT/2;
-    //     this.camera.update(dt);
-    // }
     update(dt: number){
-        // if the camera is out of bounds, move it towards inbounds
-        // otherwise update player etc
-        // get player's current sector
         const sx = Math.floor(this.player.position.x / this.sectorWidthCells / this.cellWidthPx);
         const sy = Math.floor(this.player.position.y / this.sectorHeightCells / this.cellWidthPx);
         this.currentSector = this.sectorLookup.get(sx, sy);
@@ -100,8 +56,6 @@ export class World{
         }
         this.camera.targetPosition = this.player.position.copy();
         this.camera.update(dt);
-        // if(!this.shouldUpdate(dt)) return;
-        // this.handleCamera(dt);
         if(this.camera.isOob(this.camera.position)) return;
         this.player.update(dt);
     }
