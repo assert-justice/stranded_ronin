@@ -6,6 +6,9 @@ import { AABB } from "../libs/core/aabb";
 import { Vec2 } from "../libs/core/la";
 import { Player } from "./player";
 import { Camera } from "../libs/core/camera";
+import { Pool } from "../libs/core/pool";
+import { Target } from "./target";
+import { Bullet } from "./bullet";
 
 export class World{
     rooms: Set<Room>;
@@ -19,6 +22,8 @@ export class World{
     wall: Graphics.Texture;
     player: Player;
     currentSector?: Sector;
+    targets: Pool;
+    playerBullets: Pool;
     constructor(rooms: Set<Room>, sectorLookup: HashGrid2D<Sector | undefined>, cellWidthPx: number, sectorWidthCells: number, sectorHeightCells: number){
         this.rooms = rooms;
         this.sectorLookup = sectorLookup;
@@ -29,13 +34,32 @@ export class World{
         this.brown = Graphics.Texture.fromColor(WIDTH, HEIGHT, 139, 69, 19, 255);
         this.wall = Graphics.Texture.fromColor(14, 14, 100, 100, 100, 255);
         this.player = new Player(this);
-        this.player.position.x = WIDTH/2; this.player.position.y = HEIGHT/2;
-        this.camera.position = this.player.position.copy();
+        // this.camera.position = new Vec2(WIDTH/2, HEIGHT/2);
         this.collisionLookup = new HashGrid2D(0);
+        this.targets = new Pool(()=> new Target(this));
+        this.playerBullets = new Pool(() => new Bullet(this));
         for (const sector of sectorLookup.data.values()) {
             if(!sector) continue;
             this.drawSector(sector);
             this.addSectorCollision(sector);
+        }
+        for (const room of rooms) {
+            // spawn entities
+            for (const ent of room.entities) {
+                if(ent.name === "Game_Start"){
+                    this.player.position = new Vec2(ent.posX, ent.posY);
+                    this.camera.position = this.player.position.copy();
+                }
+                else if(ent.name === "Spawner"){
+                    const type = ent.properties.get('Type');
+                    if(!type) continue;
+                    if(type === 'Target'){
+                        const target = this.targets.getNew();
+                        target.position.x = ent.posX;
+                        target.position.y = ent.posY;
+                    }
+                }
+            }
         }
     }
     update(dt: number){
@@ -58,6 +82,8 @@ export class World{
         this.camera.update(dt);
         if(this.camera.isOob(this.camera.position)) return;
         this.player.update(dt);
+        this.targets.update(dt);
+        this.playerBullets.update(dt);
     }
     draw(){
         this.camera.draw(0, 0, ()=>{
@@ -69,7 +95,17 @@ export class World{
                 val.texture.draw(val.posX*sw, val.posY*sh);
             }
             this.player.draw();
+            this.targets.draw();
+            this.playerBullets.draw();
         });
+    }
+    isSolid(pos: Vec2){
+        const cx = Math.floor(pos.x / this.cellWidthPx);
+        const cy = Math.floor(pos.y / this.cellWidthPx);
+        return this.isCellSolid(cx, cy);
+    }
+    isCellSolid(cx: number, cy: number){
+        return !!this.collisionLookup.get(cx, cy);
     }
     /**
     Mutates velocity and position in place.
@@ -82,8 +118,8 @@ export class World{
         let minY = -Infinity;
         let maxX = Infinity;
         let maxY = Infinity;
-        if(this.collisionLookup.get(cx - 1, cy)) minX = cx * this.cellWidthPx;
-        if(this.collisionLookup.get(cx + 1, cy)) maxX = cx * this.cellWidthPx;
+        if(this.isCellSolid(cx - 1, cy)) minX = cx * this.cellWidthPx;
+        if(this.isCellSolid(cx + 1, cy)) maxX = cx * this.cellWidthPx;
         if(aabb.position.x < minX){
             velocity.x = 0;
             aabb.position.x = minX;
@@ -146,7 +182,14 @@ export class World{
             const roomWidthCells = roomWidthSectors * sectorWidthCells;
             const roomXSectors = level.worldX / sectorWidthPx;
             const roomYSectors = level.worldY / sectorHeightPx;
-            const room = {posX: roomXSectors, posY: roomYSectors, width: roomWidthSectors, height: roomHeightSectors, properties: new Map()};
+            const room: Room = {
+                posX: roomXSectors, 
+                posY: roomYSectors, 
+                width: roomWidthSectors, 
+                height: roomHeightSectors, 
+                properties: new Map(),
+                entities: [],
+            };
             const layers = level.layerInstances;
             if(!layers) throw 'validation error';
             const intGrid = layers[0].intGridCsv;
@@ -162,6 +205,20 @@ export class World{
                 }
                 sector.cells.push(intGrid[idx]);
             }
+            const entities = layers[1].entityInstances;
+            for (const ent of entities) {
+                const summary: EntitySummary = {
+                    id: ent.defUid,
+                    posX: ent.__worldX ?? 0,
+                    posY: ent.__worldY ?? 0,
+                    name: ent.__identifier,
+                    properties: new Map(),
+                };
+                room.entities.push(summary);
+                for (const field of ent.fieldInstances) {
+                    summary.properties.set(field.__identifier, ''+field.__value);
+                }
+            }
             rooms.add(room);
         }
         return new World(rooms, sectorLookup, cellWidthPx, sectorWidthCells, sectorHeightCells);
@@ -174,6 +231,7 @@ interface Room{
     width: number;
     height: number;
     properties: Map<string, string>;
+    entities: EntitySummary[];
 }
 
 interface Sector{
@@ -182,4 +240,12 @@ interface Sector{
     cells: number[];
     texture?: Graphics.Texture;
     room: Room;
+}
+
+interface EntitySummary{
+    id: number;
+    posX: number;
+    posY: number;
+    name: string;
+    properties: Map<string, string>;
 }

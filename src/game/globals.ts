@@ -11,9 +11,10 @@ export class Globals{
     static inputManager: InputManager;
     static textureManager: TextureManager;
     static init(){
-        //
         this.textureManager = new TextureManager();
         this.textureManager.add('player', './sprites/redsamurai.png');
+        this.textureManager.add('target', './sprites/eye.png');
+        this.textureManager.add('shuriken', './sprites/shuriken.png');
         this.inputManager = new InputManager();
         // configure inputs
         const move = this.inputManager.addAxis2D("move");
@@ -22,6 +23,7 @@ export class Globals{
         const aim = this.inputManager.addAxis2D("aim");
         aim.xAxis.addJoyAxis(0, JoyAxis.rx);
         aim.yAxis.addJoyAxis(0, JoyAxis.ry);
+        this.inputManager.addButton("fire").addMouseButton(0);
         this.app = new App();
     }
 }

@@ -48,7 +48,13 @@ export class Vec2{
     copy(){
         return new Vec2(this.x, this.y);
     }
+    /**
+     * Returns the angle to the vector in radians.
+     */
     angle(): number{
         return Math.atan2(this.y, this.x);
+    }
+    toString(): string{
+        return `Vec2(${this.x}, ${this.y})`;
     }
 }

@@ -323,22 +323,6 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "Game_Start",
-							"__grid": [19,15],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#BE4A2F",
-							"iid": "bb22bc40-73f0-11ef-9810-65790aee81b1",
-							"width": 16,
-							"height": 16,
-							"defUid": 5,
-							"px": [304,240],
-							"fieldInstances": [],
-							"__worldX": 304,
-							"__worldY": 240
-						},
-						{
 							"__identifier": "Spawner",
 							"__grid": [10,6],
 							"__pivot": [0,0],
@@ -496,7 +480,40 @@
 					"seed": 4794304,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Spawner",
+							"__grid": [13,7],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D77643",
+							"iid": "671262e0-73f0-11ef-9810-4f6c34d9b8cb",
+							"width": 16,
+							"height": 16,
+							"defUid": 9,
+							"px": [208,112],
+							"fieldInstances": [{ "__identifier": "Type", "__type": "String", "__value": "Target", "__tile": null, "defUid": 10, "realEditorValues": [] }],
+							"__worldX": 208,
+							"__worldY": -240
+						},
+						{
+							"__identifier": "Spawner",
+							"__grid": [29,10],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D77643",
+							"iid": "67eac180-73f0-11ef-9810-05994f618afe",
+							"width": 16,
+							"height": 16,
+							"defUid": 9,
+							"px": [464,160],
+							"fieldInstances": [{ "__identifier": "Type", "__type": "String", "__value": "Target", "__tile": null, "defUid": 10, "realEditorValues": [] }],
+							"__worldX": 464,
+							"__worldY": -192
+						}
+					]
 				}
 			],
 			"__neighbours": [ { "levelIid": "1e04c910-73f0-11ef-8416-cf8bff2136fb", "dir": "s" }, { "levelIid": "c5db0f70-73f0-11ef-9810-69f7e3a6e84a", "dir": "sw" }, { "levelIid": "293de350-73f0-11ef-9810-19c9d4c71077", "dir": "s" }, { "levelIid": "6c616350-73f0-11ef-9810-ffdefbb855a3", "dir": "w" } ]
@@ -597,7 +614,40 @@
 					"seed": 1060252,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "Spawner",
+							"__grid": [25,11],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#D77643",
+							"iid": "6392b200-73f0-11ef-9810-955213f3b82c",
+							"width": 16,
+							"height": 16,
+							"defUid": 9,
+							"px": [400,176],
+							"fieldInstances": [{ "__identifier": "Type", "__type": "String", "__value": "Target", "__tile": null, "defUid": 10, "realEditorValues": [] }],
+							"__worldX": -240,
+							"__worldY": 176
+						},
+						{
+							"__identifier": "Game_Start",
+							"__grid": [32,15],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "507f59e0-73f0-11ef-9810-fbc5ad6174b5",
+							"width": 16,
+							"height": 16,
+							"defUid": 5,
+							"px": [512,240],
+							"fieldInstances": [],
+							"__worldX": -128,
+							"__worldY": 240
+						}
+					]
 				}
 			],
 			"__neighbours": [ { "levelIid": "1e04c910-73f0-11ef-8416-cf8bff2136fb", "dir": "e" }, { "levelIid": "376828f0-73f0-11ef-9810-afa2fa5d76dc", "dir": "ne" }, { "levelIid": "6c616350-73f0-11ef-9810-ffdefbb855a3", "dir": "n" } ]
