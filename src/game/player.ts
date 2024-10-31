@@ -25,6 +25,8 @@ export class Player extends Actor{
         this.aim = Globals.inputManager.getAxis2D("aim");
         this.fire = Globals.inputManager.getButton("fire");
         this.spr = new TileSprite(Globals.textureManager.get('player'), 16, 16);
+        this.offset.x = -8;
+        this.offset.y = -8;
     }
     update(dt: number): void {
         this.velocity = this.move.getValue().mulMutate(this.speed);
@@ -48,7 +50,7 @@ export class Player extends Actor{
         super.update(dt);
     }
     draw(): void {
-        this.spr.draw(this.position.x, this.position.y);
+        this.spr.draw(this.position.x - 8, this.position.y - 8);
         const pos = Globals.app.getMousePosition().addMutate(this.world.camera.position).subMutate(new Vec2(WIDTH/2, HEIGHT/2));
         this.reticule.draw(pos.x, pos.y);
     }

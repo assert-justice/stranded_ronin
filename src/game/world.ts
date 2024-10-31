@@ -34,7 +34,6 @@ export class World{
         this.brown = Graphics.Texture.fromColor(WIDTH, HEIGHT, 139, 69, 19, 255);
         this.wall = Graphics.Texture.fromColor(14, 14, 100, 100, 100, 255);
         this.player = new Player(this);
-        // this.camera.position = new Vec2(WIDTH/2, HEIGHT/2);
         this.collisionLookup = new HashGrid2D(0);
         this.targets = new Pool(()=> new Target(this));
         this.playerBullets = new Pool(() => new Bullet(this));
@@ -48,7 +47,8 @@ export class World{
             for (const ent of room.entities) {
                 if(ent.name === "Game_Start"){
                     this.player.position = new Vec2(ent.posX, ent.posY);
-                    this.camera.position = this.player.position.copy();
+                    this.camera.position.x = Math.floor(this.player.position.x/WIDTH) * WIDTH + WIDTH/2;
+                    this.camera.position.y = Math.floor(this.player.position.y/HEIGHT) * HEIGHT + HEIGHT/2;
                 }
                 else if(ent.name === "Spawner"){
                     const type = ent.properties.get('Type');
@@ -113,31 +113,35 @@ export class World{
     moveAndSlide(dt: number, velocity: Vec2, aabb: AABB){
         const cx = Math.floor(aabb.position.x / this.cellWidthPx);
         const cy = Math.floor(aabb.position.y / this.cellWidthPx);
-        aabb.position.addMutate(velocity.mul(dt));
+        const pos = aabb.position.copy();
+        pos.addMutate(aabb.offset).addMutate(velocity.mul(dt));
         let minX = -Infinity;
         let minY = -Infinity;
         let maxX = Infinity;
         let maxY = Infinity;
         if(this.isCellSolid(cx - 1, cy)) minX = cx * this.cellWidthPx;
         if(this.isCellSolid(cx + 1, cy)) maxX = cx * this.cellWidthPx;
-        if(aabb.position.x < minX){
+        if(pos.x < minX){
             velocity.x = 0;
-            aabb.position.x = minX;
+            pos.x = minX;
         }
-        else if(aabb.position.x > maxX){
+        else if(pos.x > maxX){
             velocity.x = 0;
-            aabb.position.x = maxX;
+            pos.x = maxX;
         }
         if(this.collisionLookup.get(cx, cy - 1)) minY = cy * this.cellWidthPx;
         if(this.collisionLookup.get(cx, cy + 1)) maxY = cy * this.cellWidthPx;
-        if(aabb.position.y < minY){
+        if(pos.y < minY){
             velocity.y = 0;
-            aabb.position.y = minY;
+            pos.y = minY;
         }
-        else if(aabb.position.y > maxY){
+        else if(pos.y > maxY){
             velocity.y = 0;
-            aabb.position.y = maxY;
+            pos.y = maxY;
         }
+        pos.subMutate(aabb.offset);
+        aabb.position.x = pos.x;
+        aabb.position.y = pos.y;
     }
     addSectorCollision(sector: Sector){
         const xOffset = sector.posX * this.sectorWidthCells;
