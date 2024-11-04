@@ -9,6 +9,7 @@ import { Camera } from "../libs/core/camera";
 import { Pool } from "../libs/core/pool";
 import { Target } from "./target";
 import { Bullet } from "./bullet";
+import { Hud } from "./hud";
 
 export class World{
     rooms: Set<Room>;
@@ -24,6 +25,7 @@ export class World{
     currentSector?: Sector;
     targets: Pool;
     playerBullets: Pool;
+    hud: Hud;
     constructor(rooms: Set<Room>, sectorLookup: HashGrid2D<Sector | undefined>, cellWidthPx: number, sectorWidthCells: number, sectorHeightCells: number){
         this.rooms = rooms;
         this.sectorLookup = sectorLookup;
@@ -37,6 +39,7 @@ export class World{
         this.collisionLookup = new HashGrid2D(0);
         this.targets = new Pool(()=> new Target(this));
         this.playerBullets = new Pool(() => new Bullet(this));
+        this.hud = new Hud(this);
         for (const sector of sectorLookup.data.values()) {
             if(!sector) continue;
             this.drawSector(sector);
@@ -84,6 +87,7 @@ export class World{
         this.player.update(dt);
         this.targets.update(dt);
         this.playerBullets.update(dt);
+        this.hud.update();
     }
     draw(){
         this.camera.draw(0, 0, ()=>{
@@ -98,6 +102,7 @@ export class World{
             this.targets.draw();
             this.playerBullets.draw();
         });
+        this.hud.draw();
     }
     isSolid(pos: Vec2){
         const cx = Math.floor(pos.x / this.cellWidthPx);

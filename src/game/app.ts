@@ -2,6 +2,7 @@ import { Graphics } from "cleo";
 import { Game } from "./game";
 import { Globals, HEIGHT, WIDTH } from "./globals";
 import { WindowDisplay } from "./window_display";
+import { Text } from "../libs/core/text";
 
 export type AppState = 'menu' | 'map' | 'dialogue' | 'play';
 
@@ -10,9 +11,11 @@ export class App{
     game?: Game;
     private bg: Graphics.Texture;
     private wd: WindowDisplay;
+    text: Text;
     constructor(){
         this.bg = Graphics.Texture.new(WIDTH, HEIGHT);
         this.wd = new WindowDisplay(this.bg);
+        this.text = new Text(Globals.fontSpr, 0, 'Sample text');
         // this.wd.pixelPerfect = true;
     }
     setState(state: AppState){
@@ -30,6 +33,7 @@ export class App{
         // draw game
         this.game?.draw();
         // draw ui
+        // this.text.draw(0, 0);
         Graphics.popRenderTarget();
         this.wd.draw();
     }
