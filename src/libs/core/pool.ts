@@ -59,6 +59,9 @@ export class Pool{
     values(){
         return this.data.values();
     }
+    get size(){
+        return this.data.size;
+    }
     // forEach(fn: (element: Entity)=>void){
     //     // this.data.values().forEach(fn);
     //     for (const value of this.data.values()) {

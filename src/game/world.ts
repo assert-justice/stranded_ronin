@@ -23,6 +23,7 @@ export class World{
     wall: Graphics.Texture;
     player: Player;
     currentSector?: Sector;
+    currentRoom?: Room;
     targets: Pool;
     playerBullets: Pool;
     hud: Hud;
@@ -40,11 +41,6 @@ export class World{
         this.targets = new Pool(()=> new Target(this));
         this.playerBullets = new Pool(() => new Bullet(this));
         this.hud = new Hud(this);
-        for (const sector of sectorLookup.data.values()) {
-            if(!sector) continue;
-            this.drawSector(sector);
-            this.addSectorCollision(sector);
-        }
         for (const room of rooms) {
             // spawn entities
             for (const ent of room.entities) {
@@ -53,15 +49,15 @@ export class World{
                     this.camera.position.x = Math.floor(this.player.position.x/WIDTH) * WIDTH + WIDTH/2;
                     this.camera.position.y = Math.floor(this.player.position.y/HEIGHT) * HEIGHT + HEIGHT/2;
                 }
-                else if(ent.name === "Spawner"){
-                    const type = ent.properties.get('Type');
-                    if(!type) continue;
-                    if(type === 'Target'){
-                        const target = this.targets.getNew();
-                        target.position.x = ent.posX;
-                        target.position.y = ent.posY;
-                    }
-                }
+                // else if(ent.name === "Spawner"){
+                //     const type = ent.properties.get('Type');
+                //     if(!type) continue;
+                //     if(type === 'Target'){
+                //         const target = this.targets.getNew();
+                //         target.position.x = ent.posX;
+                //         target.position.y = ent.posY;
+                //     }
+                // }
             }
         }
     }
@@ -73,6 +69,25 @@ export class World{
             const sw = this.sectorWidthCells*this.cellWidthPx;
             const sh = this.sectorHeightCells*this.cellWidthPx;
             const room = this.currentSector.room;
+            if(room != this.currentRoom){
+                // render needed segments
+                for (const sector of room.sectors) {
+                    this.drawSector(sector);
+                    this.addSectorCollision(sector);
+                }
+                this.targets.clear();
+                for (const ent of room.entities) {
+                    if(ent.name === "Spawner"){
+                        const type = ent.properties.get("Type");
+                        if(type === "Target"){
+                            const target = this.targets.getNew();
+                            target.position.x = ent.posX;
+                            target.position.y = ent.posY;
+                        }
+                    }
+                }
+            }
+            this.currentRoom = room;
             this.camera.minX = room.posX * sw + WIDTH/2;
             this.camera.minY = room.posY * sh + HEIGHT/2;
             this.camera.maxX = (room.posX + room.width) * sw - WIDTH/2;
@@ -198,6 +213,7 @@ export class World{
                 height: roomHeightSectors, 
                 properties: new Map(),
                 entities: [],
+                sectors: [],
             };
             const layers = level.layerInstances;
             if(!layers) throw 'validation error';
@@ -210,6 +226,7 @@ export class World{
                 let sector = sectorLookup.get(sx, sy);
                 if(!sector){
                     sector = {posX: sx, posY: sy, cells: [], room};
+                    room.sectors.push(sector);
                     sectorLookup.set(sx, sy, sector);
                 }
                 sector.cells.push(intGrid[idx]);
@@ -241,6 +258,7 @@ interface Room{
     height: number;
     properties: Map<string, string>;
     entities: EntitySummary[];
+    sectors: Sector[];
 }
 
 interface Sector{
