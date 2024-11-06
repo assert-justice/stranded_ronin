@@ -9,6 +9,7 @@ import { Bullet } from "./bullet";
 import { AnimatedSprite, SpriteAnimation } from "../libs/core/animated_sprite";
 import { SpriteSheet } from "../libs/core/sprite_sheet";
 import { angleDiff } from "../libs/core/math";
+import { Sprite } from "../libs/core/sprite";
 
 export class Player extends Actor{
     reticule: Graphics.Texture;
@@ -23,6 +24,7 @@ export class Player extends Actor{
     // spr: TileSprite;
     spr: AnimatedSprite;
     sword: AnimatedSprite;
+    wand: Sprite;
     // dir = 0;
     aimDir = 0;
     magazine = 20;
@@ -52,15 +54,12 @@ export class Player extends Actor{
         const swordSheet = new SpriteSheet(Globals.textureManager.get('slash'), 32, 32);
         this.sword = new AnimatedSprite(swordSheet);
         const swordAnim = new SpriteAnimation('slash', 24, 'once', [0,1,2,3]);
-        // swordAnim.frames = [0,1,2,3];
-        // swordAnim.framerate = 12;
-        // swordAnim.mode = 'once';
-        // swordAnim.name = 'slash';
         this.sword.addAnimation(swordAnim);
         this.sword.setAnimation('slash');
         this.sword.play();
         this.sword.properties.ox = 16;
         this.sword.properties.oy = 16;
+        this.wand = new Sprite(Globals.textureManager.get('wand'), {oy:2});
     }
     update(dt: number): void {
         if(this.fireClock > 0) this.fireClock -= dt;
@@ -79,14 +78,13 @@ export class Player extends Actor{
         if(this.inputMode === 'mk'){
             // const pos = Globals.app.getMousePosition().addMutate(this.world.camera.position).subMutate(new Vec2(WIDTH/2, HEIGHT/2)).subMutate(this.position);
             // this.aimDir = pos.angle();
-            this.aimDir = this.aim.getValue().angle();
+            if(this.aim.getValue().length()>0) this.aimDir = this.aim.getValue().angle();
         }
         if(this.fire.isDown() && this.fireClock <= 0 && this.reloadClock <= 0 && this.magazine > 0){
             const bullet = this.world.playerBullets.getNew() as Bullet;
-            const aimX = Math.cos(this.aimDir);
-            const aimY = Math.sin(this.aimDir);
-            bullet.velocity = new Vec2(aimX, aimY).mulMutate(this.bulletSpeed);
-            bullet.position = this.position.copy();
+            const aim = Vec2.fromAngle(this.aimDir);
+            bullet.velocity = aim.mul(this.bulletSpeed);
+            bullet.position = this.position.copy().addMutate(aim.mul(8));
             this.magazine--;
             this.fireClock = 0.3;
         }
@@ -115,8 +113,10 @@ export class Player extends Actor{
     draw(): void {
         this.spr.draw(this.position.x, this.position.y);
         // const pos = Globals.app.getMousePosition().addMutate(this.world.camera.position).subMutate(new Vec2(WIDTH/2, HEIGHT/2));
-        const pos = this.aim.getValue().mulMutate(16).addMutate(this.position);
-        this.reticule.draw(pos.x, pos.y);
+        const pos = Vec2.fromAngle(this.aimDir).mulMutate(8).addMutate(this.position);
+        this.wand.properties.angle = this.aimDir;
+        this.wand.draw(pos.x, pos.y);
+        // this.reticule.draw(pos.x, pos.y);
         this.sword.properties.angle = this.aimDir;
         if(this.sword.isPlaying()) this.sword.draw(this.position.x, this.position.y);
     }

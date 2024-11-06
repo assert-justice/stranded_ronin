@@ -54,6 +54,11 @@ export class Vec2{
     angle(): number{
         return Math.atan2(this.y, this.x);
     }
+    static fromAngle(angle: number){
+        const aimX = Math.cos(angle);
+        const aimY = Math.sin(angle);
+        return new Vec2(aimX, aimY);
+    }
     toString(): string{
         return `Vec2(${this.x}, ${this.y})`;
     }
