@@ -8,8 +8,8 @@ export class Bullet extends Actor{
     constructor(world: World){
         super(world);
         this.spr = new TileSprite(Globals.textureManager.get('shuriken'), 16, 16);
-        this.offset.x = -8;
-        this.offset.y = -8;
+        this.spr.properties.ox = 8;
+        this.spr.properties.oy = 8;
     }
     update(dt: number): void {
         const speed = this.velocity.length();
@@ -24,7 +24,7 @@ export class Bullet extends Actor{
         }
     }
     draw(): void {
-        this.spr.draw(this.position.x - 8, this.position.y - 8);
+        this.spr.draw(this.position.x, this.position.y);
     }
     damage(val: number): void {
         //

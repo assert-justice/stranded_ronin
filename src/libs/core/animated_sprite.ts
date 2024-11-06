@@ -12,6 +12,12 @@ export class SpriteAnimation{
         if(this.frames.length === 0) return 0;
         return this.frames[mod(idx, this.frames.length)];
     }
+    constructor(name: string, framerate: number, mode: typeof this.mode, frames: number[]){
+        this.name = name; 
+        this.framerate = framerate; 
+        this.mode = mode; 
+        this.frames = frames;
+    }
 }
 
 export class AnimatedSprite extends Sprite{
@@ -19,7 +25,7 @@ export class AnimatedSprite extends Sprite{
     get frame(){return this._frame;}
     set frame(v: number){
         this._frame = v;
-        this.frameIdx = this.currentAnimation.getFrame(v);
+        this.frameIdx = this.currentAnimation?.getFrame(v) ?? 0;
         this.frameProgress = 0;
         this.setProps(this.sheet.getSpriteProps(this.frameIdx, this.properties));
     }
@@ -37,7 +43,7 @@ export class AnimatedSprite extends Sprite{
     private frameDirection = 1;
     private frameProgress = 0;
     private animations = new Map<string, SpriteAnimation>();
-    private currentAnimation = new SpriteAnimation();
+    private currentAnimation?:SpriteAnimation;
     constructor(spriteSheet: SpriteSheet){
         super(spriteSheet.tex, {
             width: spriteSheet.frameWidth, 
@@ -57,12 +63,12 @@ export class AnimatedSprite extends Sprite{
         this.reset();
     }
     getAnimation(){
-        return this.currentAnimation.name;
+        return this.currentAnimation?.name ?? "none";
     }
     play(){
         this.reset();
         this._isPlaying = true;
-        this.frame = this._isReversed ? this.currentAnimation.frames.length-1 : 0;
+        this.frame = this._isReversed ? (this.currentAnimation?.frames.length ?? 1)-1 : 0;
     }
     pause(){this._isPlaying = false;}
     resume(){this._isPlaying = true;}
@@ -75,12 +81,12 @@ export class AnimatedSprite extends Sprite{
     update(dt: number){
         if(!this._isPlaying) return;
         this.frameProgress += dt;
-        const frameTime = 1 / this.currentAnimation.framerate;
+        const frameTime = 1 / (this.currentAnimation?.framerate ?? 1);
         if(this.frameProgress < frameTime) return;
         this.frameProgress -= frameTime;
         this.frame += this.frameDirection;
-        if(this.frame < 0 || this.frame >= this.currentAnimation.frames.length){
-            switch (this.currentAnimation.mode) {
+        if(this.frame < 0 || this.frame >= (this.currentAnimation?.frames.length ?? 1)){
+            switch (this.currentAnimation?.mode) {
                 case "once":
                     this.stop();
                     break;
