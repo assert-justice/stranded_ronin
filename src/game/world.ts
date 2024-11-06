@@ -113,8 +113,8 @@ export class World{
                 if(!val.texture) continue;
                 val.texture.draw(val.posX*sw, val.posY*sh);
             }
-            this.player.draw();
             this.targets.draw();
+            this.player.draw();
             this.playerBullets.draw();
         });
         this.hud.draw();

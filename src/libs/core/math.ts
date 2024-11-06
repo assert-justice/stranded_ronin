@@ -5,3 +5,7 @@ export function clamp(value: number, min: number, max: number){
 export function mod(n: number, m: number) {
     return ((n % m) + m) % m;
 }
+
+export function angleDiff(x: number, y: number){
+    return Math.atan2(Math.sin(x-y), Math.cos(x-y));
+}

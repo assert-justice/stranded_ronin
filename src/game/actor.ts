@@ -16,4 +16,5 @@ export abstract class Actor extends Entity{
     update(dt: number): void {
         this.world.moveAndSlide(dt, this.velocity, new AABB(this.position, 16, 16, this.offset));
     }
+    abstract damage(val: number): void;
 }

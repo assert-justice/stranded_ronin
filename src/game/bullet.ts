@@ -15,8 +15,18 @@ export class Bullet extends Actor{
         const speed = this.velocity.length();
         super.update(dt);
         if(this.velocity.length() < speed) this.cleanup();
+        for (const e of this.world.targets.values()) {
+            const ent = e as Actor;
+            if(ent.position.sub(this.position).length() < 8){
+                ent.damage(5);
+                this.cleanup();
+            }
+        }
     }
     draw(): void {
         this.spr.draw(this.position.x - 8, this.position.y - 8);
+    }
+    damage(val: number): void {
+        //
     }
 }
