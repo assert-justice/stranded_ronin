@@ -1,10 +1,9 @@
-import { Engine, Graphics, System } from "cleo";
+import { Engine, System } from "cleo";
 import { Actor } from "./actor";
 import { World } from "./world";
 import { VAxis2D, VButton } from "../libs/core/input_manager";
-import { Globals, HEIGHT, WIDTH } from "./globals";
+import { Globals } from "./globals";
 import { Vec2 } from "../libs/core/la";
-import { TileSprite } from "../libs/core/tile_sprite";
 import { Bullet } from "./bullet";
 import { AnimatedSprite, SpriteAnimation } from "../libs/core/animated_sprite";
 import { SpriteSheet } from "../libs/core/sprite_sheet";
@@ -12,7 +11,6 @@ import { angleDiff } from "../libs/core/math";
 import { Sprite } from "../libs/core/sprite";
 
 export class Player extends Actor{
-    reticule: Graphics.Texture;
     move: VAxis2D;
     aim: VAxis2D;
     melee: VButton;
@@ -20,12 +18,10 @@ export class Player extends Actor{
     reload: VButton;
     inputMode: 'mk' | 'gamepad' = 'mk';
     speed = 200;
-    bulletSpeed = 600;
-    // spr: TileSprite;
+    bulletSpeed = 300;
     spr: AnimatedSprite;
     sword: AnimatedSprite;
     wand: Sprite;
-    // dir = 0;
     aimDir = 0;
     magazine = 20;
     magCapacity = 20;
@@ -34,13 +30,11 @@ export class Player extends Actor{
     reloadClock = 0;
     constructor(world: World){
         super(world);
-        this.reticule = Graphics.Texture.fromColor(4, 4, 255, 0, 0, 255);
         this.move = Globals.inputManager.getAxis2D("move");
         this.aim = Globals.inputManager.getAxis2D("aim");
         this.melee = Globals.inputManager.getButton("melee");
         this.fire = Globals.inputManager.getButton("fire");
         this.reload = Globals.inputManager.getButton("reload");
-        // this.spr = new TileSprite(Globals.textureManager.get('player'), 16, 16);
         const sprSheet = new SpriteSheet(Globals.textureManager.get('player'), 16, 16);
         this.spr = new AnimatedSprite(sprSheet);
         this.spr.addAnimation(new SpriteAnimation('down', 12, 'loop', [0, 4, 8, 12]));
@@ -116,7 +110,6 @@ export class Player extends Actor{
         const pos = Vec2.fromAngle(this.aimDir).mulMutate(8).addMutate(this.position);
         this.wand.properties.angle = this.aimDir;
         this.wand.draw(pos.x, pos.y);
-        // this.reticule.draw(pos.x, pos.y);
         this.sword.properties.angle = this.aimDir;
         if(this.sword.isPlaying()) this.sword.draw(this.position.x, this.position.y);
     }
