@@ -2,7 +2,7 @@ import { Engine, System } from "cleo";
 import { Actor } from "./actor";
 import { World } from "./world";
 import { VAxis2D, VButton } from "../libs/core/input_manager";
-import { Globals } from "./globals";
+import { Globals, HEIGHT, WIDTH } from "./globals";
 import { Vec2 } from "../libs/core/la";
 import { Bullet } from "./bullet";
 import { AnimatedSprite, SpriteAnimation } from "../libs/core/animated_sprite";
@@ -39,9 +39,10 @@ export class Player extends Actor{
     maxMana = 100;
     stamina = 100;
     maxStamina = 100;
-    staminaRegen = 100;
+    staminaRegen = 50;
     staminaDelay = 0.5;
     staminaClock = 0;
+    staminaUsable = true;
     dashCost = 30;
     dashClock = 0;
     dashDuration = 0.3;
@@ -83,7 +84,10 @@ export class Player extends Actor{
         if(this.staminaClock > 0) this.staminaClock -= dt;
         if(this.stamina < this.maxStamina && this.staminaClock <= 0){
             this.stamina += dt * this.staminaRegen;
-            if(this.stamina > this.maxStamina) this.stamina = this.maxStamina;
+        }
+        if(this.stamina >= this.maxStamina) {
+            this.stamina = this.maxStamina;
+            this.staminaUsable = true;
         }
         if(this.dashClock <= 0){
             this.velocity = this.move.getValue().mul(this.speed);
@@ -99,8 +103,10 @@ export class Player extends Actor{
         if(this.velocity.length()>0 && !this.spr.isPlaying()) this.spr.play();
         if(this.velocity.length()===0 && this.spr.isPlaying()) this.spr.stop();
         if(this.inputMode === 'mk'){
-            // const pos = Globals.app.getMousePosition().addMutate(this.world.camera.position).subMutate(new Vec2(WIDTH/2, HEIGHT/2)).subMutate(this.position);
-            // this.aimDir = pos.angle();
+            const pos = Globals.app.getMousePosition().addMutate(this.world.camera.position).subMutate(new Vec2(WIDTH/2, HEIGHT/2)).subMutate(this.position);
+            this.aimDir = pos.angle();
+        }
+        else if(this.inputMode === 'gamepad'){
             if(this.aim.getValue().length()>0) this.aimDir = this.aim.getValue().angle();
         }
         if(this.fire.isDown() && this.fireClock <= 0 && this.reloadClock <= 0 && this.magazine > 0){
@@ -128,11 +134,21 @@ export class Player extends Actor{
                 if(Math.abs(aDiff) < 1.5) ent.damage(10);
             }
         }
-        if(this.dash.isPressed() && this.move.getValue().length() > 0 && this.stamina >= this.dashCost){
+        if(this.dash.isPressed() && this.staminaUsable && this.move.getValue().length() > 0){
             this.stamina -= this.dashCost;
             this.staminaClock = this.staminaDelay;
             this.dashClock = this.dashDuration;
             this.velocity = this.move.getValue().mul(this.dashSpeed);
+            if(this.stamina < 0){
+                this.stamina = 0;
+                this.staminaUsable = false;
+            }
+        }
+        if(this.heal.isPressed()){
+            this.damage(30);
+        }
+        if(this.spell.isPressed()){
+            this.mana -= 30;
         }
         this.spr.update(dt);
         this.sword.update(dt);
@@ -151,5 +167,10 @@ export class Player extends Actor{
     }
     damage(val: number): void {
         //
+        this.health -= val;
+        if(this.health <= 0){
+            this.health = 0;
+            // die
+        }
     }
 }

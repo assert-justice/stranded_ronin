@@ -18,7 +18,7 @@ export class Hud{
     lastHealth = 0;
     lastMana = 0;
     lastStamina = 0;
-    barSpeed = 1;
+    barSpeed = 0.5;
     constructor(world: World){
         this.world = world;
         const border = 2;
@@ -39,10 +39,10 @@ export class Hud{
         this.staminaBar.value = player.stamina / player.maxStamina;
         if(this.staminaBarLast.value > this.staminaBar.value){this.staminaBarLast.value -= dt * this.barSpeed;}
         if(this.staminaBarLast.value < this.staminaBar.value){this.staminaBarLast.value = this.staminaBar.value;}
-        if(this.staminaBarLast.value > this.staminaBar.value){this.staminaBarLast.value -= dt * this.barSpeed;}
-        if(this.staminaBarLast.value < this.staminaBar.value){this.staminaBarLast.value = this.staminaBar.value;}
-        if(this.staminaBarLast.value > this.staminaBar.value){this.staminaBarLast.value -= dt * this.barSpeed;}
-        if(this.staminaBarLast.value < this.staminaBar.value){this.staminaBarLast.value = this.staminaBar.value;}
+        if(this.healthBarLast.value > this.healthBar.value){this.healthBarLast.value -= dt * this.barSpeed;}
+        if(this.healthBarLast.value < this.healthBar.value){this.healthBarLast.value = this.healthBar.value;}
+        if(this.manaBarLast.value > this.manaBar.value){this.manaBarLast.value -= dt * this.barSpeed;}
+        if(this.manaBarLast.value < this.manaBar.value){this.manaBarLast.value = this.manaBar.value;}
     }
     draw(){
         const ax = WIDTH - this.ammoText.width;
