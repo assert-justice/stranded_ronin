@@ -19,6 +19,8 @@ export class Globals{
         this.textureManager.add('shuriken', './sprites/shuriken.png');
         this.textureManager.add('font', './sprites/big_font.png');
         this.textureManager.add('slash', './sprites/slash.png');
+        this.textureManager.add('sparkle', './sprites/sparkle.png');
+        this.textureManager.add('wand', './sprites/wand.png');
         this.fontSpr = new TileSprite(this.textureManager.get('font'), 10, 14);
         this.inputManager = new InputManager();
         // configure inputs
