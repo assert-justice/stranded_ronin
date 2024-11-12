@@ -20,14 +20,14 @@ In the meantime space pirates have taken over, building large encampments and ho
 |Fire|Right Trigger|Mouse 2|
 |Use|A|E|
 |Bullet Time|Left Trigger|Shift|
-|Use Power|Y|Q|
+|Use Power|B|Q|
 |Reload|X|R|
 |Dash|Left Bumper|Space|
 |Sidearm|D-Right|1|
 |Longarm|D-Up|2|
 |Heavy|D-Left|3|
 |Grapple|D-Down|4|
-|Heal|B|F|
+|Heal|Y|F|
 |Map|Select|Tab|
 |Pause|Start|Esc|
 

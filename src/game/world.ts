@@ -102,7 +102,7 @@ export class World{
         this.player.update(dt);
         this.targets.update(dt);
         this.playerBullets.update(dt);
-        this.hud.update();
+        this.hud.update(dt);
     }
     draw(){
         this.camera.draw(0, 0, ()=>{

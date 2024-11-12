@@ -16,8 +16,13 @@ export class Player extends Actor{
     melee: VButton;
     fire: VButton;
     reload: VButton;
+    dash: VButton;
+    spell: VButton;
+    heal: VButton;
+    chrono: VButton;
     inputMode: 'mk' | 'gamepad' = 'mk';
     speed = 200;
+    dashSpeed = 400;
     bulletSpeed = 300;
     spr: AnimatedSprite;
     sword: AnimatedSprite;
@@ -28,6 +33,18 @@ export class Player extends Actor{
     ammo = 100;
     fireClock = 0;
     reloadClock = 0;
+    health = 100;
+    maxHealth = 100;
+    mana = 100;
+    maxMana = 100;
+    stamina = 100;
+    maxStamina = 100;
+    staminaRegen = 100;
+    staminaDelay = 0.5;
+    staminaClock = 0;
+    dashCost = 30;
+    dashClock = 0;
+    dashDuration = 0.3;
     constructor(world: World){
         super(world);
         this.move = Globals.inputManager.getAxis2D("move");
@@ -35,6 +52,10 @@ export class Player extends Actor{
         this.melee = Globals.inputManager.getButton("melee");
         this.fire = Globals.inputManager.getButton("fire");
         this.reload = Globals.inputManager.getButton("reload");
+        this.dash = Globals.inputManager.getButton("dash");
+        this.spell = Globals.inputManager.getButton("spell");
+        this.heal = Globals.inputManager.getButton("heal");
+        this.chrono = Globals.inputManager.getButton("chrono");
         const sprSheet = new SpriteSheet(Globals.textureManager.get('player'), 16, 16);
         this.spr = new AnimatedSprite(sprSheet);
         this.spr.addAnimation(new SpriteAnimation('down', 12, 'loop', [0, 4, 8, 12]));
@@ -58,7 +79,15 @@ export class Player extends Actor{
     update(dt: number): void {
         if(this.fireClock > 0) this.fireClock -= dt;
         if(this.reloadClock > 0) this.reloadClock -= dt;
-        this.velocity = this.move.getValue().mulMutate(this.speed);
+        if(this.dashClock > 0) this.dashClock -= dt;
+        if(this.staminaClock > 0) this.staminaClock -= dt;
+        if(this.stamina < this.maxStamina && this.staminaClock <= 0){
+            this.stamina += dt * this.staminaRegen;
+            if(this.stamina > this.maxStamina) this.stamina = this.maxStamina;
+        }
+        if(this.dashClock <= 0){
+            this.velocity = this.move.getValue().mul(this.speed);
+        }
         let dir = this.spr.getAnimation();
         if(this.velocity.y > 0) dir = "down";
         else if(this.velocity.y < 0) dir = "up";
@@ -99,9 +128,16 @@ export class Player extends Actor{
                 if(Math.abs(aDiff) < 1.5) ent.damage(10);
             }
         }
+        if(this.dash.isPressed() && this.move.getValue().length() > 0 && this.stamina >= this.dashCost){
+            this.stamina -= this.dashCost;
+            this.staminaClock = this.staminaDelay;
+            this.dashClock = this.dashDuration;
+            this.velocity = this.move.getValue().mul(this.dashSpeed);
+        }
         this.spr.update(dt);
         this.sword.update(dt);
         super.update(dt);
+        // System.println("after", this.velocity.length(), "\n");
         if(Globals.inputManager.getButton("quit").isPressed()) Engine.quit();
     }
     draw(): void {

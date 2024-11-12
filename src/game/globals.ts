@@ -35,6 +35,9 @@ export class Globals{
         this.inputManager.addButton("reload").addKey(Key.r).addJoyButton(0, JoyButton.x);
         this.inputManager.addButton("use").addKey(Key.e).addJoyButton(0, JoyButton.a);
         this.inputManager.addButton("dash").addKey(Key.space).addJoyButton(0, JoyButton.lb);
+        this.inputManager.addButton("spell").addKey(Key.q).addJoyButton(0, JoyButton.b);
+        this.inputManager.addButton("heal").addKey(Key.f).addJoyButton(0, JoyButton.y);
+        this.inputManager.addButton("chrono").addKey(Key.left_shift).addInput(()=>Input.joyGetAxis(0, JoyAxis.lt) > 0);
         this.inputManager.addButton("quit").addKey(Key.escape).addJoyButton(0, JoyButton.start);
         this.app = new App();
     }
