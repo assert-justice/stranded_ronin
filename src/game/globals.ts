@@ -31,6 +31,8 @@ export class Globals{
         this.inputManager.addButton("fire").addMouseButton(1).addInput(()=>Input.joyGetAxis(0, JoyAxis.rt) > 0);
         this.inputManager.addButton("melee").addMouseButton(0).addJoyButton(0, JoyButton.rb);
         this.inputManager.addButton("reload").addKey(Key.r).addJoyButton(0, JoyButton.x);
+        this.inputManager.addButton("use").addKey(Key.e).addJoyButton(0, JoyButton.a);
+        this.inputManager.addButton("dash").addKey(Key.space).addJoyButton(0, JoyButton.lb);
         this.inputManager.addButton("quit").addKey(Key.escape).addJoyButton(0, JoyButton.start);
         this.app = new App();
     }
