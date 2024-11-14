@@ -19,6 +19,7 @@ export class Bullet extends Actor{
         this.spr.play();
     }
     update(dt: number): void {
+        dt *= Globals.timeScale;
         const speed = this.velocity.length();
         super.update(dt);
         this.spr.update(dt);

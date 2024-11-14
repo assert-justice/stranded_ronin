@@ -11,6 +11,7 @@ export class Hud{
     healthBar: HudBar;
     manaBar: HudBar;
     staminaBar: HudBar;
+    chronoBar: HudBar;
     healthBarLast: HudBar;
     manaBarLast: HudBar;
     staminaBarLast: HudBar;
@@ -26,6 +27,7 @@ export class Hud{
         this.healthBar = new HudBar(100, 8, 0.5, new Color(127, 0, 0), border);
         this.manaBar = new HudBar(100, 8, 1, new Color(0, 0, 127), border);
         this.staminaBar = new HudBar(100, 8, 1, new Color(0, 127, 0), border);
+        this.chronoBar = new HudBar(100, 8, 1, new Color(127, 127, 0), border);
         this.healthBarLast = new HudBar(100, 8, 0.5, new Color(255, 255, 0), border);
         this.manaBarLast = new HudBar(100, 8, 1, new Color(0, 0, 255), border);
         this.staminaBarLast = new HudBar(100, 8, 1, new Color(0, 255, 0), border);
@@ -37,6 +39,7 @@ export class Hud{
         this.healthBar.value = player.health / player.maxHealth;
         this.manaBar.value = player.mana / player.maxMana;
         this.staminaBar.value = player.stamina / player.maxStamina;
+        this.chronoBar.value = player.chrono / player.maxChrono;
         if(this.staminaBarLast.value > this.staminaBar.value){this.staminaBarLast.value -= dt * this.barSpeed;}
         if(this.staminaBarLast.value < this.staminaBar.value){this.staminaBarLast.value = this.staminaBar.value;}
         if(this.healthBarLast.value > this.healthBar.value){this.healthBarLast.value -= dt * this.barSpeed;}
@@ -47,6 +50,8 @@ export class Hud{
     draw(){
         const ax = WIDTH - this.ammoText.width;
         const ay = HEIGHT - this.ammoText.height;
+        const cx = WIDTH - this.chronoBar.width;
+        const cy = ay - this.chronoBar.height;
         const sy = HEIGHT - this.staminaBar.height;
         const my = sy - this.manaBar.height;
         const hy = my - this.healthBar.height;
@@ -63,5 +68,8 @@ export class Hud{
         this.staminaBar.draw(0, sy);
 
         this.ammoText.draw(ax, ay);
+
+        this.backgroundBar.draw(cx, cy);
+        this.chronoBar.draw(cx, cy);
     }
 }

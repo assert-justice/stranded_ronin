@@ -12,6 +12,7 @@ export class Globals{
     static inputManager: InputManager;
     static textureManager: TextureManager;
     static fontSpr: TileSprite;
+    static timeScale = 1;
     static init(){
         this.textureManager = new TextureManager();
         this.textureManager.add('player', './sprites/redsamurai.png');

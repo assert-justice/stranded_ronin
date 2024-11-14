@@ -26,6 +26,7 @@ export class Target extends Actor{
         this.randomDir();
     }
     update(dt: number): void {
+        dt *= Globals.timeScale;
         this.spr.update(dt);
         const s = this.velocity.length();
         super.update(dt);

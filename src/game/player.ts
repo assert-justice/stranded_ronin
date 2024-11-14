@@ -13,13 +13,13 @@ import { Sprite } from "../libs/core/sprite";
 export class Player extends Actor{
     move: VAxis2D;
     aim: VAxis2D;
-    melee: VButton;
-    fire: VButton;
-    reload: VButton;
-    dash: VButton;
-    spell: VButton;
-    heal: VButton;
-    chrono: VButton;
+    meleeButton: VButton;
+    fireButton: VButton;
+    reloadButton: VButton;
+    dashButton: VButton;
+    spellButton: VButton;
+    healButton: VButton;
+    chronoButton: VButton;
     inputMode: 'mk' | 'gamepad' = 'mk';
     speed = 200;
     dashSpeed = 400;
@@ -46,17 +46,22 @@ export class Player extends Actor{
     dashCost = 30;
     dashClock = 0;
     dashDuration = 0.3;
+    chrono = 100;
+    maxChrono = 100;
+    chronoRegen = 50;
+    chronoDeplete = 25;
+    chronoUseable = true;
     constructor(world: World){
         super(world);
         this.move = Globals.inputManager.getAxis2D("move");
         this.aim = Globals.inputManager.getAxis2D("aim");
-        this.melee = Globals.inputManager.getButton("melee");
-        this.fire = Globals.inputManager.getButton("fire");
-        this.reload = Globals.inputManager.getButton("reload");
-        this.dash = Globals.inputManager.getButton("dash");
-        this.spell = Globals.inputManager.getButton("spell");
-        this.heal = Globals.inputManager.getButton("heal");
-        this.chrono = Globals.inputManager.getButton("chrono");
+        this.meleeButton = Globals.inputManager.getButton("melee");
+        this.fireButton = Globals.inputManager.getButton("fire");
+        this.reloadButton = Globals.inputManager.getButton("reload");
+        this.dashButton = Globals.inputManager.getButton("dash");
+        this.spellButton = Globals.inputManager.getButton("spell");
+        this.healButton = Globals.inputManager.getButton("heal");
+        this.chronoButton = Globals.inputManager.getButton("chrono");
         const sprSheet = new SpriteSheet(Globals.textureManager.get('player'), 16, 16);
         this.spr = new AnimatedSprite(sprSheet);
         this.spr.addAnimation(new SpriteAnimation('down', 12, 'loop', [0, 4, 8, 12]));
@@ -78,6 +83,24 @@ export class Player extends Actor{
         this.wand = new Sprite(Globals.textureManager.get('wand'), {oy:2});
     }
     update(dt: number): void {
+        if(this.chronoButton.isDown() && this.chronoUseable){
+            Globals.timeScale = 0.25;
+            this.chrono -= this.chronoDeplete * dt;
+            if(this.chrono < 0){
+                this.chronoUseable = false;
+            }
+        }
+        else{
+            Globals.timeScale = 1;
+            if(this.chrono < this.maxChrono){
+                this.chrono += this.chronoRegen * dt;
+            }
+            if(this.chrono >= this.maxChrono){
+                this.chrono = this.maxChrono;
+                this.chronoUseable = true;
+            }
+        }
+        dt *= Globals.timeScale;
         if(this.fireClock > 0) this.fireClock -= dt;
         if(this.reloadClock > 0) this.reloadClock -= dt;
         if(this.dashClock > 0) this.dashClock -= dt;
@@ -109,7 +132,7 @@ export class Player extends Actor{
         else if(this.inputMode === 'gamepad'){
             if(this.aim.getValue().length()>0) this.aimDir = this.aim.getValue().angle();
         }
-        if(this.fire.isDown() && this.fireClock <= 0 && this.reloadClock <= 0 && this.magazine > 0){
+        if(this.fireButton.isDown() && this.fireClock <= 0 && this.reloadClock <= 0 && this.magazine > 0){
             const bullet = this.world.playerBullets.getNew() as Bullet;
             const aim = Vec2.fromAngle(this.aimDir);
             bullet.velocity = aim.mul(this.bulletSpeed);
@@ -117,14 +140,14 @@ export class Player extends Actor{
             this.magazine--;
             this.fireClock = 0.3;
         }
-        if(this.reload.isPressed() && this.magazine < this.magCapacity){
+        if(this.reloadButton.isPressed() && this.magazine < this.magCapacity){
             this.reloadClock = 1;
             const missing = this.magCapacity - this.magazine;
             const amount = missing < this.ammo ? missing : this.ammo;
             this.ammo -= amount;
             this.magazine += amount;
         }
-        if(this.melee.isPressed()) {
+        if(this.meleeButton.isPressed()) {
             this.sword.play();
             for (const e of this.world.targets.values()) {
                 const ent = e as Actor;
@@ -134,7 +157,7 @@ export class Player extends Actor{
                 if(Math.abs(aDiff) < 1.5) ent.damage(10);
             }
         }
-        if(this.dash.isPressed() && this.staminaUsable && this.move.getValue().length() > 0){
+        if(this.dashButton.isPressed() && this.staminaUsable && this.move.getValue().length() > 0){
             this.stamina -= this.dashCost;
             this.staminaClock = this.staminaDelay;
             this.dashClock = this.dashDuration;
@@ -144,10 +167,10 @@ export class Player extends Actor{
                 this.staminaUsable = false;
             }
         }
-        if(this.heal.isPressed()){
+        if(this.healButton.isPressed()){
             this.damage(30);
         }
-        if(this.spell.isPressed()){
+        if(this.spellButton.isPressed()){
             this.mana -= 30;
         }
         this.spr.update(dt);
