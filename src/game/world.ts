@@ -10,6 +10,7 @@ import { Pool } from "../libs/core/pool";
 import { Target } from "./target";
 import { Bullet } from "./bullet";
 import { Hud } from "./hud";
+import { Actor } from "./actor";
 
 export class World{
     rooms: Set<Room>;
@@ -49,15 +50,6 @@ export class World{
                     this.camera.position.x = Math.floor(this.player.position.x/WIDTH) * WIDTH + WIDTH/2;
                     this.camera.position.y = Math.floor(this.player.position.y/HEIGHT) * HEIGHT + HEIGHT/2;
                 }
-                // else if(ent.name === "Spawner"){
-                //     const type = ent.properties.get('Type');
-                //     if(!type) continue;
-                //     if(type === 'Target'){
-                //         const target = this.targets.getNew();
-                //         target.position.x = ent.posX;
-                //         target.position.y = ent.posY;
-                //     }
-                // }
             }
         }
     }
@@ -80,9 +72,13 @@ export class World{
                     if(ent.name === "Spawner"){
                         const type = ent.properties.get("Type");
                         if(type === "Target"){
-                            const target = this.targets.getNew();
+                            if(ent.properties.get("dead")){continue;}
+                            const target = this.targets.getNew() as Actor;
                             target.position.x = ent.posX;
                             target.position.y = ent.posY;
+                            target.onDeath = ()=>{
+                                ent.properties.set("dead", "true");
+                            };
                         }
                     }
                 }

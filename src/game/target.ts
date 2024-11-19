@@ -41,7 +41,9 @@ export class Target extends Actor{
     }
     damage(val: number): void {
         this.health -= val;
-        if(this.health <= 0) this.cleanup();
+        if(this.health <= 0) {
+            this.die();
+        }
     }
     randomDir(){
         const idx = Math.floor(Math.random() * 4);

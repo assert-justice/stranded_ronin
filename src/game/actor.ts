@@ -6,6 +6,7 @@ import { World } from "./world";
 export abstract class Actor extends Entity{
     velocity: Vec2;
     world: World;
+    onDeath = () => {};
     constructor(world: World){
         super();
         this.velocity = new Vec2();
@@ -15,4 +16,8 @@ export abstract class Actor extends Entity{
         this.world.moveAndSlide(dt, this.velocity, new AABB(this.position, 16, 16, new Vec2(-8,-8)));
     }
     abstract damage(val: number): void;
+    die(){
+        this.onDeath();
+        this.cleanup();
+    }
 }
